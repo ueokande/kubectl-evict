@@ -23,7 +23,7 @@ $ kubectl evict -l app=nginx
 
 Evict all pods from of a deployment named nginx:
 ```console
-$ kubectl evict deployment/nginx -c nginx-1
+$ kubectl evict deployment/nginx
 ```
 
 Evict all pods from node worker-1:
