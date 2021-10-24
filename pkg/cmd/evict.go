@@ -44,6 +44,9 @@ var (
 type EvictOptions struct {
 	configFlags *genericclioptions.ConfigFlags
 
+	GracePeriodSeconds int64
+	DryRun             bool
+
 	ResourceArg string
 	Selector    string
 	Object      runtime.Object
@@ -83,6 +86,9 @@ func NewCmdEvict(streams genericclioptions.IOStreams) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&o.Selector, "selector", "l", o.Selector, "Selector (label query) to filter on.")
+	cmd.Flags().BoolVar(&o.DryRun, "dry-run", false, "If true, submit server-side request without persisting the resource.")
+	cmd.Flags().Int64Var(&o.GracePeriodSeconds, "grace-period", -1, "Period of time in seconds given to the resource to terminate gracefully. Ignored if negative.")
+
 	o.configFlags.AddFlags(cmd.PersistentFlags())
 
 	return cmd
@@ -151,13 +157,27 @@ func (o *EvictOptions) RunEvict(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	opts := new(metav1.DeleteOptions)
+	if o.GracePeriodSeconds >= 0 {
+		opts.GracePeriodSeconds = &o.GracePeriodSeconds
+	}
+	if o.DryRun {
+		opts.DryRun = []string{metav1.DryRunAll}
+	}
+
+	verb := "evicted"
+	if o.DryRun {
+		verb = "evicted (dry-run)"
+	}
+
 	eviction := NewEvictClient(api)
 	for _, pod := range pods {
-		err := eviction.EvictPod(ctx, pod)
+		err := eviction.EvictPod(ctx, pod, opts)
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(o.Out, "pod %s/%s evicted\n", pod.Namespace, pod.Name)
+		fmt.Fprintf(o.Out, "pod %s/%s %s\n", pod.Namespace, pod.Name, verb)
 	}
 	return nil
 }

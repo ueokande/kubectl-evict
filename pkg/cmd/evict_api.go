@@ -17,7 +17,7 @@ const (
 )
 
 type Client interface {
-	EvictPod(ctx context.Context, pod corev1.Pod) error
+	EvictPod(ctx context.Context, pod corev1.Pod, opts *metav1.DeleteOptions) error
 }
 
 func evictGroupVersion(clientset kubernetes.Interface) schema.GroupVersion {
@@ -49,12 +49,13 @@ type ClientV1 struct {
 	client kubernetes.Interface
 }
 
-func (c *ClientV1) EvictPod(ctx context.Context, pod corev1.Pod) error {
+func (c *ClientV1) EvictPod(ctx context.Context, pod corev1.Pod, opts *metav1.DeleteOptions) error {
 	eviction := &policyv1.Eviction{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pod.Name,
 			Namespace: pod.Namespace,
 		},
+		DeleteOptions: opts,
 	}
 	return c.client.PolicyV1().Evictions(eviction.Namespace).Evict(context.TODO(), eviction)
 }
@@ -63,12 +64,13 @@ type ClientV1beta1 struct {
 	client kubernetes.Interface
 }
 
-func (c *ClientV1beta1) EvictPod(ctx context.Context, pod corev1.Pod) error {
+func (c *ClientV1beta1) EvictPod(ctx context.Context, pod corev1.Pod, opts *metav1.DeleteOptions) error {
 	eviction := &policyv1beta1.Eviction{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pod.Name,
 			Namespace: pod.Namespace,
 		},
+		DeleteOptions: opts,
 	}
 	return c.client.PolicyV1beta1().Evictions(eviction.Namespace).Evict(context.TODO(), eviction)
 }
