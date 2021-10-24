@@ -9,7 +9,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -129,7 +128,7 @@ func (o *EvictOptions) Complete(cmd *cobra.Command, args []string) error {
 	}
 	o.Object = infos[0].Object
 	if o.Selector != "" && len(o.Object.(*corev1.PodList).Items) == 0 {
-		return fmt.Errorf("No resources found in %s namespace.\n", namespace)
+		return fmt.Errorf("no resources found in %s namespace", namespace)
 	}
 	if _, ok := o.Object.(*corev1.Node); namespaceOverwride && ok {
 		return errors.New("--namespace should not be specified with node target")
@@ -163,13 +162,13 @@ func (o *EvictOptions) RunEvict(ctx context.Context) error {
 	return nil
 }
 
-func podsForObject(ctx context.Context, api corev1client.CoreV1Interface, object runtime.Object) ([]v1.Pod, error) {
+func podsForObject(ctx context.Context, api corev1client.CoreV1Interface, object runtime.Object) ([]corev1.Pod, error) {
 	switch t := object.(type) {
 	case *corev1.PodList:
 		return t.Items, nil
 
 	case *corev1.Pod:
-		return []v1.Pod{*t}, nil
+		return []corev1.Pod{*t}, nil
 	}
 
 	namespace, labelsel, fieldsel, err := selectorsForObject(object)
