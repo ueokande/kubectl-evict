@@ -1,14 +1,15 @@
 # kubectl-evict
 
-A kubectl plugin to evict pods
+A kubectl plugin to evict pods. This plugin is good to remove a pod from your
+cluster or to test your PodDistruptionBudget.
 
-## Installation
+## :cd: Installation
 
 ```console
 $ go install github.com/ueokande/kubectl-evict@latest
 ```
 
-## Usage
+## :notebook_with_decorative_cover: Usage
 
 Evict a pod nginx:
 ```console
@@ -30,7 +31,7 @@ Evict all pods from node worker-1:
 $ kubectl evict node/worker-1
 ```
 
-## Developing
+## :hammer_and_wrench: Developing
 
 Create a cluster:
 
@@ -44,6 +45,6 @@ Then deploy nginx with a Deployment and PodDIsruptionBudget:
 $ kubectl apply -f .kind/deployment.yaml -f .kind/pdb.yaml
 ```
 
-## LICENSE
+## :memo: LICENSE
 
 [MIT](./LICENSE)
