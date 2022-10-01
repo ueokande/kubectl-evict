@@ -123,7 +123,7 @@ func (o *EvictOptions) Complete(cmd *cobra.Command, args []string) error {
 		b.ResourceNames("pods", o.ResourceArg)
 	}
 	if o.Selector != "" {
-		b.ResourceNames("pods").LabelSelectorParam(o.Selector)
+		b.ResourceTypes("pods").LabelSelectorParam(o.Selector)
 	}
 
 	infos, err := b.Do().Infos()
