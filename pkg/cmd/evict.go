@@ -176,7 +176,7 @@ func (o *EvictOptions) RunEvict(ctx context.Context) error {
 	for _, pod := range pods {
 		err := eviction.EvictPod(ctx, pod, opts)
 		if err != nil {
-			return err
+			return fmt.Errorf("pod %s/%s\n%w", pod.Namespace, pod.Name, err)
 		}
 		fmt.Fprintf(o.Out, "pod %s/%s %s\n", pod.Namespace, pod.Name, verb)
 	}
